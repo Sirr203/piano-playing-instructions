@@ -15,12 +15,8 @@ stream = p.open(format=pyaudio.paFloat32,
 
 # Aubio's pitch detection
 pDetection = aubio.pitch("default", 2048, 1024, 48000)
-
 pDetection.set_unit("Hz")
 pDetection.set_silence(-40)
-
-# Time window for note input in seconds
-input_window = 3
 
 def get_note():
     data = stream.read(1024)
@@ -29,7 +25,7 @@ def get_note():
     # Convert frequency to musical note
     return aubio.freq2note(pitch)
 
-expected_note = 'A4'  # Replace 'A4' with the expected note
+expected_note = 'A4' 
 
 while True:
     start_time = time.time()
