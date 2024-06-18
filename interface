@@ -1,53 +1,86 @@
 import tkinter as tk
 
-# Create main window
+# Tạo cửa sổ chính
 root = tk.Tk()
 root.title('Music Sheet Interface')
 
-# Create a canvas to draw music lines and blocks
+# Tạo canvas để vẽ các dòng nhạc và block
 canvas = tk.Canvas(root, width=1800, height=400, bg='purple')
 canvas.pack()
 
-# Draw musical lines
+# Vẽ các dòng nhạc
 num_lines = 5
 line_spacing = 20
-top_margin = 50
+top_margin = 150
 
 for i in range(num_lines):
     y_position = top_margin + i * line_spacing
-    canvas.create_line(50, y_position, 1750, y_position, fill='white', width=2)
-
-# Drawing bass lines
+    canvas.create_line(50, y_position, 1550, y_position, fill='white', width=2)
+    print(y_position)
+# Vẽ các dòng nhạc bass
 bass_top_margin = 250
-for i in range(num_lines):
-    y_position = bass_top_margin + i * line_spacing
-    canvas.create_line(50, y_position, 1750, y_position, fill='white', width=2)
 
-# Draw Sol and Fa
-treble_clef = canvas.create_text(30, top_margin + 2 * line_spacing, text="𝄞", fill='white', font=("Arial", 32))
-bass_clef = canvas.create_text(30, bass_top_margin + 2 * line_spacing, text="𝄢", fill='white', font=("Arial", 32))
+# Vẽ khóa Sol và khóa Fa
+treble_clef = canvas.create_text(120, top_margin + 1.5 * line_spacing, text="𝄞", fill='white', font=("Segoe UI Symbol", 92))
 
-# Create a fixed indicator line (cursor)
-cursor = canvas.create_rectangle(400, top_margin - 10, 405, bass_top_margin + 4 * line_spacing + 10, fill='cyan')
+# bass_clef = canvas.create_text(30, bass_top_margin + 2 * line_spacing, text="𝄢", fill='white', font=("Arial", 32))
 
-# List to store blocks and related information
+# Tạo dòng chỉ báo (cursor) cố định
+cursor = canvas.create_rectangle(200, top_margin - 60, 205, bass_top_margin + 4 * line_spacing -33, fill='cyan')
+
+# Danh sách để lưu trữ các block và thông tin liên quan
 blocks = []
 
-# Create block for each note
+# Hàm để tạo block cho mỗi nốt nhạc
+
 def create_block(note, time_to_appear, y_position):
     x_position = 1800 - time_to_appear * 50  # Vị trí x phụ thuộc vào thời gian xuất hiện
-    block = canvas.create_oval(x_position, y_position - 5, x_position + 10, y_position + 5, fill='black')
+    block = canvas.create_text(x_position, y_position, text="♩", fill='black', font=("Segoe UI Symbol", 80),tags=('note',))
+    #ledger_line = canvas.create_line(x_position - 20, y_position +30, x_position + 20, y_position +30, fill='black', width=2)
     blocks.append((block, y_position))
+    #blocks.append((ledger_line, y_position))
+
+    print(y_position)
+    create_ledger_line( x_position,y_position, top_margin)
+    
+
+def create_ledger_line(x_position, y_position, top_margin):
+    # Kiểm tra xem nốt nhạc có cần dòng kẻ phụ không
+    if y_position < top_margin or y_position > 200:
+        ledger_line = canvas.create_line(x_position - 20, y_position +30, x_position + 20, y_position +30, fill='black', width=2,tags=('note',))
+        blocks.append((ledger_line, y_position))
+
 
 def move_blocks():
     for block, y_position in blocks:
         canvas.move(block, -10, 0)  # Di chuyển mỗi block sang trái 10 pixels
     root.after(100, move_blocks)
 
-# Converts note symbols to positions on the music line
+def update():
+    # Lấy tọa độ của cursor
+    cursor_coords = canvas.coords(cursor)
+    # Tìm tất cả các items chồng lấp với cursor
+    overlapping_items = canvas.find_overlapping(*cursor_coords)
+    
+    for item in overlapping_items:
+        # Kiểm tra xem item có phải là nốt nhạc không (ví dụ: kiểm tra tag hoặc kiểu của item)
+        if is_note_item(item):
+            # Xóa item nốt nhạc khỏi canvas
+            canvas.delete(item)
+    
+    # Cập nhật lại canvas sau mỗi khoảng thời gian (ví dụ: 100ms)
+    canvas.after(100, update)
+
+def is_note_item(item):
+    tags = canvas.gettags(item)
+    return 'note' in tags
+
+
+
+# Hàm để chuyển đổi ký hiệu nốt nhạc thành vị trí trên dòng nhạc
 def note_to_position(note):
     note_positions = {
-        'C4': top_margin + 4 * line_spacing,
+        'C4': top_margin + 3.4 * line_spacing,
         'D4': top_margin + 3.5 * line_spacing,
         'E4': top_margin + 3 * line_spacing,
         'F4': top_margin + 2.5 * line_spacing,
@@ -56,35 +89,27 @@ def note_to_position(note):
         'B4': top_margin + 1 * line_spacing,
         'C5': top_margin + 0.5 * line_spacing,
         'D5': top_margin,
-        'E5': top_margin - 0.5 * line_spacing,
-        # Add bass clef notes
-        'C3': bass_top_margin + 4 * line_spacing,
-        'D3': bass_top_margin + 3.5 * line_spacing,
-        'E3': bass_top_margin + 3 * line_spacing,
-        'F3': bass_top_margin + 2.5 * line_spacing,
-        'G3': bass_top_margin + 2 * line_spacing,
-        'A3': bass_top_margin + 1.5 * line_spacing,
-        'B3': bass_top_margin + 1 * line_spacing,
-        'C4': bass_top_margin + 0.5 * line_spacing,
-        'D4': bass_top_margin,
-    }
-    return note_positions.get(note, top_margin + 2 * line_spacing)  
+        'E5': top_margin - 0.5 * line_spacing,}
 
-# Create block from sheet music
+    return note_positions.get(note, top_margin + 2 * line_spacing)  # Mặc định G4
+
+# Hàm để tạo các block từ sheet music
 def create_blocks_from_sheet(sheet):
     for note_info in sheet:
         note, time_to_appear = note_info
         y_position = note_to_position(note)
         create_block(note, time_to_appear, y_position)
+        
 
+# Ví dụ sheet music cho "1 con vịt"
 sheet_music = [
-    ('C4', 0), ('D4', 1), ('E4', 2), ('F4', 3),
-    ('G4', 4), ('A4', 5), ('B4', 6), ('C5', 7)
+    ('C4', 3), ('F4', 2), ('C4', 1), ('C4', 0),
 ]
 
-
+# Tạo các block từ sheet music
 create_blocks_from_sheet(sheet_music)
 
 move_blocks()
+update()
 
 root.mainloop()
