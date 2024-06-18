@@ -16,7 +16,6 @@ top_margin = 150
 for i in range(num_lines):
     y_position = top_margin + i * line_spacing
     canvas.create_line(50, y_position, 1550, y_position, fill='white', width=2)
-    print(y_position)
 # Vẽ các dòng nhạc bass
 bass_top_margin = 250
 
