@@ -12,3 +12,6 @@ This package contains an Interface **Main Interface**-’piano.py’ and two **S
 Comes with several songs notes pre-made with their perspective mp3 songs
 Piano Playing Instruction **supports multi-cross platform from Windows , MacOS, Linux**
 Piano Playing Instruction **can manually add other songs by adding an extra file similar to**-’1 con vịt’ **and their songs**
+
+![image](https://github.com/Sirr203/piano-playing-instructions/assets/147015209/143cb0b9-6efc-408e-90b8-e69d823d048e)
+
